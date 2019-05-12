@@ -61,7 +61,12 @@ Apache Kafka small installation:
 ```
 
 
+### Producer/Consumer operation
 
+```bash
+[kafka_2.12-2.2.0]$ bin/kafka-console-producer.sh --broker-list localhost:9091 --topic topic1
+[kafka_2.12-2.2.0]$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9091 --topic topic1
+```
 
 
 
