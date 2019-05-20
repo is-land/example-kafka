@@ -3,14 +3,63 @@
  */
 package island.stuff;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringSerializer;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 public class SimpleProducer {
 
-    public static void main(String[] args) {
-        System.out.println(new SimpleProducer().getGreeting());
+    final static String TOPIC_NAME = "topic3";
+
+    public static void main(String[] args) throws IOException {
+        new SimpleProducer().run(false);
     }
 
-    public String getGreeting() {
-        return "Hello world.";
+    private Properties props() {
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9091");
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, "Simple");
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        return props;
+    }
+
+    private void run(boolean async) throws IOException {
+        final KafkaProducer<String, String> producer = new KafkaProducer(props());
+
+        final Path file = Paths.get("dataset/Minimum-Wage-Data.csv");
+        Files.lines(file).forEach(line -> {
+            ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_NAME, null, line);
+            if (async) {
+                producer.send(record);
+            } else {
+                try {
+                    RecordMetadata metadata = producer.send(record).get();
+                    String message = String.format("[topic]%s, [partition]%s, [offset]%d, [timestamp]%d", metadata.topic(), metadata.partition(), metadata.offset(), metadata.timestamp());
+                    System.out.println(message);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // Infinite loop
+        while (true) try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
