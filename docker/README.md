@@ -19,6 +19,16 @@ Tutorial: [http://wurstmeister.github.io/kafka-docker/](http://wurstmeister.gith
 
 ## Usage
 
+Environment:
+
+- OS: Linux/MacOs
+- Java jdk: 8+
+
+
+Set environment parameter: 
+
+- ```export DOCKER_KAFKA_HOST=$(ipconfig getifaddr en0)```
+
 Start a cluster:
 
 - ```docker-compose up -d ```
