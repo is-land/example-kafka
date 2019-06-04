@@ -9,4 +9,4 @@
 
 rootProject.name = 'example-kafka'
 
-include 'client-api'
+include 'client-api','stream-app'
