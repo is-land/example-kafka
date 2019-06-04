@@ -1,4 +1,17 @@
+apply plugin: 'java'
+
+def scalaVersion = "2.12"
+def kafkaVersion = "2.2.0"
 
 dependencies {
-
+    compile "org.apache.kafka:kafka-clients:$kafkaVersion"
+    compile "org.apache.kafka:kafka-streams:$kafkaVersion"
+    compile "org.apache.kafka:kafka_$scalaVersion:$kafkaVersion"
 }
+
+task copyRuntimeLibs(type: Copy) {
+    into "build/libs"
+    from configurations.compile
+}
+
+build.dependsOn('copyRuntimeLibs')
